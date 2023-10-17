@@ -4,6 +4,7 @@ import Navbar from './Components/navbar/Navbar';
 import LoginModal from './Components/modals/LoginModal';
 import RegisterModal from './Components/modals/RegisterModal';
 import ToasterProvider from './providers/ToasterProvider';
+import getCurrentUser from './actions/getCurrentUser';
 
 export const metadata = {
   title: 'HomeHarbor',
@@ -14,15 +15,16 @@ const font = Nunito({
   subsets: ['latin'],
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const currentUser = await getCurrentUser()
   return (
     <html lang="en">
       <body className={font.className}>
-        <Navbar />
+        <Navbar currentUser={currentUser} />
         <LoginModal />
         <RegisterModal />
         <ToasterProvider />
