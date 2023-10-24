@@ -5,7 +5,7 @@ import LoginModal from './Components/modals/LoginModal';
 import RegisterModal from './Components/modals/RegisterModal';
 import ToasterProvider from './providers/ToasterProvider';
 import getCurrentUser from './actions/getCurrentUser';
-import RentModal from './Components/modals/RentModal';
+import RentModal from './Components/modals/RentModal/RentModal';
 
 export const metadata = {
   title: 'HomeHarbor',

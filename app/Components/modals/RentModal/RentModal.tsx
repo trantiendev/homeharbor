@@ -1,16 +1,21 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Modal from './Modal';
+import Modal from '../Modal';
 import useRentModal from '@/app/hooks/useRentModal';
-import Heading from '../Heading';
-import CategoryInput from '../inputs/CategoryInput';
-import { categories } from '../navbar/Categories';
+import Heading from '../../Heading';
+import CategoryInput from '../../inputs/CategoryInput';
+import { categories } from '../../navbar/Categories';
 import { FieldValues, useForm } from 'react-hook-form';
-import CountrySelect from '../inputs/CountrySelect';
+import CountrySelect from '../../inputs/CountrySelect';
 import dynamic from 'next/dynamic';
+import Counter from '../../inputs/Counter';
+import CategoryStep from './RentModalSteps/CategoryStep';
+import LocationStep from './RentModalSteps/LocationStep';
+import InfoStep from './RentModalSteps/InfoStep';
+import ImagesStep from './RentModalSteps/ImagesStep';
 
-interface IRentModalProps {}
+interface IRentModalProps { }
 
 enum STEPS {
   CATEGORY = 0,
@@ -50,11 +55,14 @@ const RentModal: React.FunctionComponent<IRentModalProps> = (props) => {
 
   const category = watch('category');
   const location = watch('location');
+  const guestCount = watch('guestCount');
+  const roomCount = watch('roomCount');
+  const bathroomCount = watch('bathroomCount');
 
   // Trigger import Map Cpm, solution: https://placekit.io/blog/articles/making-react-leaflet-work-with-nextjs-493i
   const Map = useMemo(
     () =>
-      dynamic(() => import('../Map'), {
+      dynamic(() => import('../../Map'), {
         ssr: false,
         loading: () => <div>loading...</div>,
       }),
@@ -77,59 +85,38 @@ const RentModal: React.FunctionComponent<IRentModalProps> = (props) => {
     setStep((value) => value - 1);
   };
 
-  const renderCategoryStep = () => (
-    <div className="flex flex-col gap-8">
-      <Heading
-        title="Which of these best describes your place?"
-        subtitle="Pick a category"
-      />
-      <div
-        className="
-          grid 
-          grid-cols-1 
-          md:grid-cols-2 
-          gap-3
-          max-h-[50vh]
-          overflow-y-auto
-        "
-      >
-        {categories.map((item) => (
-          <div key={item.label} className="col-span-1">
-            <CategoryInput
-              onClick={(category) => setCustomValue('category', category)}
-              selected={category === item.label}
-              label={item.label}
-              icon={item.icon}
-            />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderLocationStep = () => (
-    <div className="flex flex-col gap-8">
-      <Heading
-        title="Where is your place located?"
-        subtitle="Help guests find you!"
-      />
-      <CountrySelect
-        value={location}
-        onChange={(location) => setCustomValue('location', location)}
-      />
-      <Map center={location?.latlng} />
-    </div>
-  );
-
   let bodyContent;
 
   switch (step) {
     case STEPS.LOCATION:
-      bodyContent = renderLocationStep();
+      bodyContent = (
+        <LocationStep
+          location={location}
+          setLocation={setCustomValue}
+          Map={Map}
+        />
+      );
+      break;
+    case STEPS.INFO:
+      bodyContent = (
+        <InfoStep
+          guestCount={guestCount}
+          roomCount={roomCount}
+          bathroomCount={bathroomCount}
+          setInfo={setCustomValue}
+        />
+      );
+      break;
+    case STEPS.IMAGES:
+      bodyContent = (
+        <ImagesStep />
+      )
       break;
     case STEPS.CATEGORY:
     default:
-      bodyContent = renderCategoryStep();
+      bodyContent = (
+        <CategoryStep category={category} setCategory={setCustomValue} />
+      );
       break;
   }
 
